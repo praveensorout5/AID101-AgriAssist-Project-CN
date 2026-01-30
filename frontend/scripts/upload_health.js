@@ -25,27 +25,23 @@ document.addEventListener("DOMContentLoaded", () => {
             // Prepare form data
             const formData = new FormData();
             formData.append("farm_id", farmId);
-            formData.append("file_name", file.name);
             formData.append("crop_image", file);
 
+            resultContainer.innerHTML = "<p>Uploading crop image...</p>";
+
             try {
-                // Send metadata to backend
+                // Upload image to backend
                 const response = await fetch("/api/crop-health/upload", {
                     method: "POST",
-                    body: JSON.stringify({
-                        farm_id: farmId,
-                        file_name: file.name
-                    }),
-                    headers: { "Content-Type": "application/json" }
+                    body: formData
                 });
 
                 if (!response.ok) throw new Error("Failed to upload crop health data");
                 const result = await response.json();
 
-                // Display confirmation
                 resultContainer.innerHTML = `<p>${result.message}</p>`;
 
-                // Simulate inference call (Phase 3: CNN integration)
+                // Call inference endpoint
                 const inferenceResponse = await fetch("/api/crop-health/infer", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

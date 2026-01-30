@@ -9,23 +9,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const advisoryContainer = document.getElementById("advisoryContainer") || document.getElementById("advisoryList");
     const authForm = document.getElementById("authForm");
 
+    // ---------- Render Advisories ----------
+    function renderAdvisories(advisories) {
+        if (!advisories || advisories.length === 0) {
+            advisoryContainer.innerHTML = "<p>No advisories available yet.</p>";
+            return;
+        }
+        advisoryContainer.innerHTML = advisories.map(a =>
+            `<div class="advisory-card">
+                <strong>[${a.advisory_type}]</strong> ${a.message}
+            </div>`
+        ).join("");
+    }
+
     // ---------- Fetch Advisories ----------
     async function fetchAdvisories(farmId) {
+        advisoryContainer.innerHTML = "<p>Loading advisories...</p>";
         try {
             const response = await fetch(`/api/advisory/${farmId}`);
             if (!response.ok) throw new Error("Failed to fetch advisories");
             const advisories = await response.json();
-
-            if (advisories.length === 0) {
-                advisoryContainer.innerHTML = "<p>No advisories available yet.</p>";
-                return;
-            }
-
-            advisoryContainer.innerHTML = advisories.map(a =>
-                `<div class="advisory-card">
-                    <strong>[${a.type}]</strong> ${a.message}
-                </div>`
-            ).join("");
+            renderAdvisories(advisories);
         } catch (err) {
             advisoryContainer.innerHTML = `<p class="error">Error: ${err.message}</p>`;
         }
